@@ -1,18 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>TCX Heart Rate Comparison</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugo Paredes :: Tools > Compare Workouts</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <h1>Heart Rate Comparison</h1>
+    <header>
+        <div class="container">
+            <h1>Compare Workouts</h1>
+            <nav>
+                <a href="index.html">Home</a>
+                <div class="dropdown">
+                    <button class="dropbtn">Tools</button>
+                    <div class="dropdown-content">
+                        <a href="compare_workouts.html">Compare Workouts</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
 
-    <input type="file" id="tcxFiles" accept=".tcx" multiple>
-    <canvas id="hrChart"></canvas>
+    <main>
+        <div class="container">
+            <h3>Load 1 or multiple TCX files and compare the workouts. For the time being, it's only comparing heart rate data.</h3>
+            <input type="file" id="tcxFiles" accept=".tcx" multiple>
+            <canvas id="hrChart"></canvas>
+        </div>
+    </main>
 
-    <script src="compare_workouts.js"></script>
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Hugo Paredes</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 
 </html>

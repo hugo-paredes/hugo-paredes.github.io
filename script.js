@@ -1,38 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const workoutLink = document.querySelector('nav a[href="workout.html"]');
-    const mainContent = document.querySelector('main .container');
-
-    if (workoutLink && mainContent) {
-        workoutLink.addEventListener('click', (event) => {
-            event.preventDefault();
-
-            fetch('workout.html')
-                .then(response => response.text())
-                .then(html => {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-
-                    // Correctly select the section within the container
-                    const workoutSection = tempDiv.querySelector('main .container section');
-
-                    if (workoutSection) {
-                        mainContent.innerHTML = workoutSection.outerHTML; // Use outerHTML to include the <section> tag
-                        // Reattach event listener, after the content has been loaded
-                        const fileInput = document.getElementById('tcxFiles');
-                        if (fileInput) {
-                            fileInput.addEventListener('change', handleFileSelect);
-                        }
-                        // if chart already exists, destroy it
-                        if (chart) {
-                            chart.destroy();
-                        }
-                    } else {
-                        console.error('Could not find the section in workout.html');
-                    }
-                })
-                .catch(error => console.error('Error fetching workout.html:', error));
-        });
-    }
 
     const fileInput = document.getElementById('tcxFiles');
     const chartCanvas = document.getElementById('hrChart');
