@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fileInput.addEventListener('change', handleFileSelect);
 
+    document.getElementById('resetZoom').addEventListener('click', function() {
+        if (chart) {
+            chart.resetZoom();
+        }
+    });
+
     function handleFileSelect(event) {
         const files = event.target.files; // Get the FileList
 
@@ -53,12 +59,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseTCX(xmlString) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-        const hrElements = xmlDoc.querySelectorAll('Trackpoint > HeartRateBpm > Value');
-        const hrData = [];
-        hrElements.forEach(element => {
-            hrData.push(parseInt(element.textContent, 10));
+        const trackpoints = xmlDoc.querySelectorAll('Trackpoint');
+        const data = [];
+        
+        if (trackpoints.length === 0) return data;
+        
+        // Get start time from first trackpoint
+        const startTime = new Date(trackpoints[0].querySelector('Time').textContent);
+        
+        trackpoints.forEach(trackpoint => {
+            const hrElement = trackpoint.querySelector('HeartRateBpm > Value');
+            const timeElement = trackpoint.querySelector('Time');
+            
+            if (hrElement && timeElement) {
+                const currentTime = new Date(timeElement.textContent);
+                const elapsedSeconds = (currentTime - startTime) / 1000;
+                
+                data.push({
+                    hr: parseInt(hrElement.textContent, 10),
+                    elapsedTime: elapsedSeconds
+                });
+            }
         });
-        return hrData;
+        return data;
+    }
+
+    function formatElapsedTime(seconds) {
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
 
     function createChart(datasets) {
@@ -69,23 +99,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (datasets.length === 0) return;
 
-        const maxLength = Math.max(...datasets.map(dataset => dataset.data.length));
-        const labels = Array.from(Array(maxLength).keys());
+        // Find min and max times across all datasets
+        const allTimes = datasets.flatMap(dataset => 
+            dataset.data.map(point => point.elapsedTime)
+        );
+        const minTime = Math.floor(Math.min(...allTimes));
+        const maxTime = Math.ceil(Math.max(...allTimes));
+
+        const transformedDatasets = datasets.map((dataset, index) => ({
+            label: dataset.label,
+            data: dataset.data.map(point => ({
+                x: point.elapsedTime,
+                y: point.hr
+            })),
+            borderWidth: 2,
+            borderColor: index === 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'transparent',
+            tension: 0.1,
+            fill: false,
+            pointRadius: 0,
+            pointHoverRadius: 5
+        }));
 
         chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
-                datasets: datasets
+                datasets: transformedDatasets
             },
             options: {
                 responsive: true,
                 scales: {
                     x: {
+                        type: 'linear',
                         display: true,
+                        min: minTime,
+                        max: maxTime,
                         title: {
                             display: true,
-                            text: 'Time/Index'
+                            text: 'Elapsed Time'
+                        },
+                        ticks: {
+                            stepSize: 60,
+                            autoSkip: false,
+                            callback: function(value) {
+                                return formatElapsedTime(value);
+                            }
                         }
                     },
                     y: {
@@ -93,6 +151,48 @@ document.addEventListener('DOMContentLoaded', () => {
                         title: {
                             display: true,
                             text: 'Heart Rate (BPM)'
+                        }
+                    }
+                },
+                plugins: {
+                    zoom: {
+                        pan: {
+                            enabled: true,
+                            mode: 'x'
+                        },
+                        zoom: {
+                            wheel: {
+                                enabled: true
+                            },
+                            pinch: {
+                                enabled: true
+                            },
+                            mode: 'x',
+                            drag: {
+                                enabled: true,
+                                backgroundColor: 'rgba(225,225,225,0.3)'
+                            }
+                        },
+                        limits: {
+                            x: {min: minTime, max: maxTime}
+                        },
+                        toolbar: {
+                            position: 'bottom',
+                            buttons: [{
+                                click: function(event, zoomPlugin) {
+                                    zoomPlugin.resetZoom();
+                                },
+                                label: 'Reset Zoom',
+                                style: {
+                                    background: '#eee',
+                                    color: '#333',
+                                    padding: '5px 10px',
+                                    borderRadius: '3px',
+                                    border: '1px solid #ccc',
+                                    cursor: 'pointer'
+                                }
+                            }],
+                            display: true
                         }
                     }
                 }
