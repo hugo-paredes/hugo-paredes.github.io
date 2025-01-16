@@ -4,10 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pace Calculator</title>
+    <title>Hugo Paredes :: Tools > Compare Workouts</title>
     <link rel="stylesheet" href="styles/styles.css">
-    <script src="scripts/paceCalculator.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-crosshair"></script>
+
     <script src="scripts/loadHeader.js" defer></script>
+    <script src="scripts/compareWorkouts.js" defer></script>
 </head>
 
 <body>
@@ -15,25 +20,10 @@
 
     <main>
         <div class="container">
-            <section id="pace-conversion">
-                <h2>Pace Conversion</h2>
-                <div>
-                    <label for="pace">Pace:</label>
-                    <input type="number" id="pace-hh" placeholder="hh" min="0" max="23">
-                    <input type="number" id="pace-mm" placeholder="mm" min="0" max="59">
-                    <input type="number" id="pace-ss" placeholder="ss" min="0" max="59">
-                    <button onclick="convertPace()">Convert</button>
-                    <p id="pace-result"></p>
-                </div>
-                <div>
-                    <label for="pace-toggle">Convert to:</label>
-                    <label class="switch">
-                        <input type="checkbox" id="pace-toggle">
-                        <span class="slider round"></span>
-                    </label>
-                    <span id="toggle-label">min/km</span>
-                </div>
-            </section>
+            <h3>Load 1 or multiple TCX files and compare the workouts. For the time being, it's only comparing heart rate data.</h3>
+            <input type="file" id="tcxFiles" accept=".tcx" multiple>
+            <button id="resetZoom">Reset Zoom</button>
+            <canvas id="hrChart"></canvas>
         </div>
     </main>
 
