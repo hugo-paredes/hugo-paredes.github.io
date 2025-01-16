@@ -150,7 +150,7 @@ input[type="number"], input[type="text"], button {
 
 button {
     background: #007bff;
-    color: white;
+    color: #000;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
