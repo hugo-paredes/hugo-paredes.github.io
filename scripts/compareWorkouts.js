@@ -175,24 +175,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         limits: {
                             x: {min: minTime, max: maxTime}
-                        },
-                        toolbar: {
-                            position: 'bottom',
-                            buttons: [{
-                                click: function(event, zoomPlugin) {
-                                    zoomPlugin.resetZoom();
-                                },
-                                label: 'Reset Zoom',
-                                style: {
-                                    background: '#eee',
-                                    color: '#333',
-                                    padding: '5px 10px',
-                                    borderRadius: '3px',
-                                    border: '1px solid #ccc',
-                                    cursor: 'pointer'
-                                }
-                            }],
-                            display: true
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        axis: 'x',
+                        callbacks: {
+                            label: function(context) {
+                                const elapsedTime = context.raw.x;
+                                const hr = context.raw.y;
+                                return `Time: ${formatElapsedTime(elapsedTime)}, HR: ${hr}`;
+                            }
+                        }
+                    },
+                    crosshair: {
+                        line: {
+                            color: '#000',
+                            width: 1
                         }
                     }
                 }
